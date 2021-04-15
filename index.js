@@ -61,10 +61,22 @@ cron.schedule('0 */30 * * * *', () => {
                     newNoticeElement.title = item.title
                     newNoticeElement.date = new Date
                     newNoticeElement.save().then(() => {
-                        console.log('new notice added at', new Date())
+                        sendNotification().then(() => {
+                            console.log('new notice added at', new Date())
+                        })
                     })
                 }
             })
         })
     })
 })
+
+
+const sendNotification = async () => {
+    return new Promise((resolve, refuse) => {
+        console.log('new notification!!')
+        //write the code for sending notification
+
+        resolve()
+    })
+}
