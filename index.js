@@ -48,7 +48,7 @@ const getNotices = () => {
 }
 
 //performs query every 30min
-cron.schedule('*/30 * * * * *', () => {
+cron.schedule('0 */30 * * * *', () => {
     console.log('check')
     getNotices().then(notices => {
         notices.forEach(item => {
