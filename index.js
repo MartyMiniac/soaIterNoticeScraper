@@ -80,7 +80,7 @@ const sendNotification = (doc) => {
         axios.post('https://onesignal.com/api/v1/notifications',
             {
                 app_id: process.env.APP_ID,
-                included_segments: ["TEST"],
+                included_segments: ["Subscribed Users"],
                 headings: {
                     en: "A New Notice on the Website"
                 },
