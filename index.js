@@ -19,7 +19,7 @@ const notice = require('./model')
 const Domain = 'https://soa.ac.in'
 //const Domain = 'http://localhost'
 
-const getNotices = async () => {
+const getNotices = () => {
     return new Promise((resolveNotice, refuseNotice) => {
 
         axios.get(Domain+'/iter')
@@ -48,7 +48,7 @@ const getNotices = async () => {
 }
 
 //performs query every 30min
-cron.schedule('0 */30 * * * *', () => {
+cron.schedule('*/30 * * * * *', () => {
     console.log('check')
     getNotices().then(notices => {
         notices.forEach(item => {
@@ -60,8 +60,8 @@ cron.schedule('0 */30 * * * *', () => {
                     newNoticeElement.url = item.url
                     newNoticeElement.title = item.title
                     newNoticeElement.date = new Date
-                    newNoticeElement.save().then(() => {
-                        sendNotification().then(() => {
+                    newNoticeElement.save().then((doc) => {
+                        sendNotification(doc).then(() => {
                             console.log('new notice added at', new Date())
                         })
                     })
@@ -72,11 +72,30 @@ cron.schedule('0 */30 * * * *', () => {
 })
 
 
-const sendNotification = async () => {
+const sendNotification = (doc) => {
     return new Promise((resolve, refuse) => {
         console.log('new notification!!')
         //write the code for sending notification
 
-        resolve()
+        axios.post('https://onesignal.com/api/v1/notifications',
+            {
+                app_id: process.env.APP_ID,
+                included_segments: ["TEST"],
+                headings: {
+                    en: "A New Notice on the Website"
+                },
+                contents: {
+                    en: doc.title+' released on '+doc.date.toLocaleString('en-US', {timeZome: 'Asia/Calcutta'})
+                },
+                app_url: doc.url
+            },
+            {
+                withCredentials: true,
+                headers: {
+                    Authorization: process.env.AUTH_KEY
+                }
+            }
+        )
+        .then(() => resolve())
     })
 }
